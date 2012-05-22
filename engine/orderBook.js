@@ -8,13 +8,9 @@ var SELL = "SELL";
 
 module.exports = {
     
-    add: function add(orderType, price, volume, exchangeData, callback) {
+    add: function(orderType, price, volume, exchangeData) {
         
-        // Avoid side effects
-        var priceString = price.toString();
-        if (SELL === orderType) {
-            priceString = (-price).toString();
-        }
+        var priceString = formatPrice(orderType, price);
         
         // Clone to avoid side effects
         var clonedVolumes = {};
@@ -22,23 +18,14 @@ module.exports = {
             clonedVolumes = $.extend({}, exchangeData.volumes); 
             
         var oldVolume = clonedVolumes[priceString];
-
+        
         // Store order prices
-        var clonedBuys; 
-        if (exchangeData.buys)
-            clonedBuys = $.extend({}, exchangeData.buys); 
-        else
-            clonedBuys = createBinaryHeap();
-            
-        var clonedSells;
-        if (exchangeData.sells)
-            clonedSells = $.extend({}, exchangeData.sells); 
-        else
-            clonedSells = createBinaryHeap();            
+        var clonedBuys = cloneOrCreate(exchangeData.buys);            
+        var clonedSells = cloneOrCreate(exchangeData.sells);          
         
         // We only need to store prices if they are new otherwise we get 
         // duplicate prices
-        if (oldVolume) {            
+        if (!oldVolume) {            
             if (SELL === orderType) {
                 clonedSells.push(-price);
             }
@@ -51,16 +38,17 @@ module.exports = {
         // order or vice versa
         var trade = false;
         if (BUY === orderType && 
-            clonedSells.length > 0 && 
-            price >= Math.abs(clonedSells.peek())) {
+            clonedSells.size() > 0 && 
+            price >= Math.abs(clonedSells.peek())) {                
             trade = true;
         }
         else if (SELL === orderType && 
-                    clonedBuys.length > 0 && 
+                    clonedBuys.size() > 0 && 
                     price <= clonedBuys.peek()) {
             trade = true;
         }
         
+        var trades = [];
         // A trade means several things
         // 1. The existing order is not added to the book
         // 2. Matching orders on the other side of the book are wiped out
@@ -69,9 +57,18 @@ module.exports = {
             var remainingVolume = volume;
             while (remainingVolume > 0) {
                 if (BUY === orderType) {
-                    var bestSellPrice = clonedBuys.peek();
-                    var bestSellVolume = 0;
+                    var bestSellPrice = Math.abs(clonedSells.peek());
+                    var bestSellVolume = clonedVolumes['-' + priceString];
+                    console.log(bestSellPrice, bestSellVolume);
+                    // The order does not wipe out any price levels
+                    if (bestSellVolume > remainingVolume) {
+                        trades.push({price: bestSellPrice, volume: remainingVolume});
+                        remainingVolume = 0;
+                        console.log(clonedVolumes[priceString]);
+                        clonedVolumes[priceString] = clonedVolumes[priceString] - remainingVolume;  
+                    }
                 }
+             
             }
         }
 
@@ -81,7 +78,7 @@ module.exports = {
         if (oldVolume) newVolume += oldVolume;
         clonedVolumes[priceString] = newVolume;
         
-        callback(null, {volumes: clonedVolumes, buys: clonedBuys, sells: clonedSells});
+        return {volumes: clonedVolumes, buys: clonedBuys, sells: clonedSells, trades: trades};
         
     },
 
@@ -89,6 +86,20 @@ module.exports = {
     SELL: SELL
 }
 
+function cloneOrCreate(prices) {
+    if (prices)
+        return $.extend({}, prices); 
+    else
+        return createBinaryHeap();    
+}
+
 function createBinaryHeap() {
     return new BinaryHeap(function(x){return x;});
+}
+
+function formatPrice(orderType, price) {
+    if (SELL === orderType) 
+        return (-price).toString();
+    else
+        return price.toString();
 }
