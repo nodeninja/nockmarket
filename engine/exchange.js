@@ -10,14 +10,21 @@ module.exports = {
     
     add: function(orderType, price, volume, exchangeData) {
         
-        var priceString = formatPrice(orderType, price);
+        var priceString = price.toString();
         
         // Clone to avoid side effects
-        var clonedVolumes = {};
-        if (exchangeData.volumes)
-            clonedVolumes = $.extend({}, exchangeData.volumes); 
+        var clonedBuyVolumes = {};
+        var clonedSellVolumes = {};
+        if (exchangeData.clonedBuyVolumes)
+            clonedBuyVolumes = $.extend({}, exchangeData.clonedBuyVolumes); 
+        if (exchangeData.clonedSellVolumes)
+            clonedSellVolumes = $.extend({}, exchangeData.clonedSellVolumes);         
             
-        var oldVolume = clonedVolumes[priceString];
+        var oldVolume;
+        if (BUY === orderType)
+            oldVolume = clonedBuyVolumes[priceString];
+        else
+            oldVolume = clonedBuyVolumes[priceString];
         
         // Store order prices
         var clonedBuys = cloneOrCreate(exchangeData.buys);            
@@ -95,11 +102,4 @@ function cloneOrCreate(prices) {
 
 function createBinaryHeap() {
     return new BinaryHeap(function(x){return x;});
-}
-
-function formatPrice(orderType, price) {
-    if (SELL === orderType) 
-        return (-price).toString();
-    else
-        return price.toString();
 }
