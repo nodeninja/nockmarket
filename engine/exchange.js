@@ -58,6 +58,9 @@ module.exports = {
                         opposingBook.volumes[priceString] = opposingBook.volumes[priceString] - remainingVolume; 
                         remainingVolume = 0;                         
                     }
+                    // The order has wiped out the entire other side
+                    else {
+                    }
             }
         }
 
