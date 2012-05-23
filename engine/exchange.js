@@ -2,94 +2,79 @@
 
 var $ = require('jquery')
     , BinaryHeap = require('./BinaryHeap');
-
-var BUY = "BUY";
-var SELL = "SELL";
+    
+var BUY = "buys", SELL = "sells";
 
 module.exports = {
     
-    add: function(orderType, price, volume, exchangeData) {
-        
-        var priceString = price.toString();
-        
-        // Clone to avoid side effects
-        var clonedBuyVolumes = {};
-        var clonedSellVolumes = {};
-        if (exchangeData.clonedBuyVolumes)
-            clonedBuyVolumes = $.extend({}, exchangeData.clonedBuyVolumes); 
-        if (exchangeData.clonedSellVolumes)
-            clonedSellVolumes = $.extend({}, exchangeData.clonedSellVolumes);         
+    buy: function(price, volume, exchangeData) {
+        return module.exports.order("buys", price, volume, exchangeData);
+    },
+    
+    BUY: BUY,
+    
+    order: function(orderType, price, volume, exchangeData) {
+
+        // Init
+        var clonedExchange = createExchange(exchangeData);
+        var priceString = price.toString();  
+        var orderBook = clonedExchange[orderType];
             
-        var oldVolume;
-        if (BUY === orderType)
-            oldVolume = clonedBuyVolumes[priceString];
-        else
-            oldVolume = clonedBuyVolumes[priceString];
-        
-        // Store order prices
-        var clonedBuys = cloneOrCreate(exchangeData.buys);            
-        var clonedSells = cloneOrCreate(exchangeData.sells);          
+        var oldVolume = orderBook.volumes[priceString];
         
         // We only need to store prices if they are new otherwise we get 
         // duplicate prices
-        if (!oldVolume) {            
-            if (SELL === orderType) {
-                clonedSells.push(-price);
-            }
-            else {
-                clonedBuys.push(price);
-            }
-        }
+        if (!oldVolume) clonedExchange[orderType].prices.push(price);
         
         // Was there a trade? This occurs when a buy order matches with a sell 
         // order or vice versa
         var trade = false;
-        if (BUY === orderType && 
-            clonedSells.size() > 0 && 
-            price >= Math.abs(clonedSells.peek())) {                
-            trade = true;
-        }
-        else if (SELL === orderType && 
-                    clonedBuys.size() > 0 && 
-                    price <= clonedBuys.peek()) {
+  
+        if (BUY == orderType && 
+            clonedExchange[SELL].prices.size() > 0 && 
+            price >= Math.abs(clonedExchange[SELL].prices.peek())) {                
             trade = true;
         }
         
-        var trades = [];
         // A trade means several things
         // 1. The existing order is not added to the book
         // 2. Matching orders on the other side of the book are wiped out
         // 3. Trades are returned in an array
+       
+        var remainingVolume = volume;
         if (trade) {
-            var remainingVolume = volume;
+            
+            var opposingBook = clonedExchange[BUY]
+            if (orderType == BUY)
+                opposingBook = clonedExchange[SELL]
+                
             while (remainingVolume > 0) {
-                if (BUY === orderType) {
-                    var bestSellPrice = Math.abs(clonedSells.peek());
-                    var bestSellVolume = clonedVolumes['-' + priceString];
-                    console.log(bestSellPrice, bestSellVolume);
+                var bestSellPrice = opposingBook.prices.peek();
+                var bestSellVolume = opposingBook.volumes[priceString];
+                    console.log(bestSellPrice, bestSellVolume, remainingVolume, priceString);
                     // The order does not wipe out any price levels
                     if (bestSellVolume > remainingVolume) {
-                        trades.push({price: bestSellPrice, volume: remainingVolume});
-                        remainingVolume = 0;
-                        console.log(clonedVolumes[priceString]);
-                        clonedVolumes[priceString] = clonedVolumes[priceString] - remainingVolume;  
+                        clonedExchange.trades.push({price: bestSellPrice, volume: remainingVolume});
+                        opposingBook.volumes[priceString] = opposingBook.volumes[priceString] - remainingVolume; 
+                        remainingVolume = 0;                         
                     }
-                }
-             
             }
         }
 
-        var newVolume = volume;
+        var newVolume = remainingVolume;
         
         // Add to existing volume
         if (oldVolume) newVolume += oldVolume;
-        clonedVolumes[priceString] = newVolume;
-        
-        return {volumes: clonedVolumes, buys: clonedBuys, sells: clonedSells, trades: trades};
+        if (newVolume > 0)
+            orderBook.volumes[priceString] = newVolume;
+        return clonedExchange;
         
     },
-
-    BUY: BUY,
+    
+    sell: function(price, volume, exchangeData) {
+        return module.exports.order("sells", price, volume, exchangeData);
+    },
+    
     SELL: SELL
 }
 
@@ -102,4 +87,22 @@ function cloneOrCreate(prices) {
 
 function createBinaryHeap() {
     return new BinaryHeap(function(x){return x;});
+}
+
+function createExchange(exchangeData) {
+    
+    function init(exchange, orderType) {
+        if (!exchange[orderType]) {
+            exchange[orderType] = {};
+            exchange[orderType].volumes = {};
+            exchange[orderType].prices = createBinaryHeap();
+        }
+    }
+    
+    var cloned = $.extend(true, {}, exchangeData);
+    cloned.trades = [];
+    init(cloned, BUY);
+    init(cloned, SELL);
+    return cloned;
+    
 }
