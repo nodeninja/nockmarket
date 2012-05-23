@@ -35,6 +35,24 @@ suite('orderBook', function() {
         exchangeData[SELL].volumes['11'].should.eql(350);
         should.not.exist(exchangeData[BUY].volumes['11']);
         done();      
+    }); 
+    
+    test('buy should add multiple levels of prices', function(done) {
+        exchangeData = exchange.buy(10, 900, exchangeData);
+        exchangeData.buys.volumes['10'].should.eql(900);     
+        exchangeData = exchange.buy(9.5, 800, exchangeData);
+        exchangeData.buys.volumes['9.5'].should.eql(800);          
+        done(); 
+        
+    }); 
+    
+    test('sell should produce multiple', function(done) {
+        exchangeData = exchange.sell(5, 1600, exchangeData);
+        console.log(exchangeData);
+        exchangeData.trades[0].price.should.eql(10.5);
+        exchangeData.trades[1].price.should.eql(10);
+        done();      
     });     
+    
 
 });
