@@ -1,19 +1,35 @@
-module.exports = BinaryHeap;
+var exchange = require('./exchange');
 
-function BinaryHeap(scoreFunction){
+module.exports = BinaryHeap;
+var BUY = "buys";
+var SELL = "sells";
+
+function BinaryHeap(scoreFunction, orderType){
   this.content = [];
+  this.orderType = orderType;
   this.scoreFunction = scoreFunction;
 }
 
 BinaryHeap.prototype = {
-
+  
+  all: function() {
+    return this.content;
+  },
   peek: function() {
+    if (BUY == this.orderType)
+      return -this.content[0];
+    else
       return this.content[0];
   },
   
   push: function(element) {
     // Add the new element to the end of the array.
-    this.content.push(element);
+    if (BUY == this.orderType) {
+      this.content.push(-element);
+      console.log(555555555555555, -element);
+    }
+    else
+      this.content.push(element);
     // Allow it to bubble up.
     this.bubbleUp(this.content.length - 1);
   },
@@ -29,10 +45,14 @@ BinaryHeap.prototype = {
       this.content[0] = end;
       this.sinkDown(0);
     }
-    return result;
+    if (BUY == this.orderType)
+      return -result;
+    else
+      return result;
   },
 
   remove: function(node) {
+    if (exchange.BUY == this.orderType) node = -node;
     var len = this.content.length;
     // To remove a value, we must search through the array to find
     // it.
@@ -43,7 +63,7 @@ BinaryHeap.prototype = {
         var end = this.content.pop();
         if (i != len - 1) {
           this.content[i] = end;
-          if (this.scoreFunction(end) > this.scoreFunction(node))
+          if (this.scoreFunction(end) < this.scoreFunction(node))
             this.bubbleUp(i);
           else
             this.sinkDown(i);
@@ -67,7 +87,7 @@ BinaryHeap.prototype = {
       var parentN = Math.floor((n + 1) / 2) - 1,
           parent = this.content[parentN];
       // Swap the elements if the parent is greater.
-      if (this.scoreFunction(element) > this.scoreFunction(parent)) {
+      if (this.scoreFunction(element) < this.scoreFunction(parent)) {
         this.content[parentN] = element;
         this.content[n] = parent;
         // Update 'n' to continue at the new position.
@@ -98,14 +118,14 @@ BinaryHeap.prototype = {
         var child1 = this.content[child1N],
             child1Score = this.scoreFunction(child1);
         // If the score is less than our element's, we need to swap.
-        if (child1Score > elemScore)
+        if (child1Score < elemScore)
           swap = child1N;
       }
       // Do the same checks for the other child.
       if (child2N < length) {
         var child2 = this.content[child2N],
             child2Score = this.scoreFunction(child2);
-        if (child2Score > (swap == null ? elemScore : child1Score))
+        if (child2Score < (swap == null ? elemScore : child1Score))
           swap = child2N;
       }
 
