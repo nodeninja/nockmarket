@@ -1,13 +1,13 @@
 'use strict';
 
 var assert = require('assert');
-var exchange = require('../engine/exchange');
+var exchange = require('../lib/exchange')
+  , nocklib = require('../lib/nocklib')
 var should = require('should');
 
-suite('orderBook', function() {
-    
-    var exchangeData = {};
-    
+var exchangeData = {};
+
+suite('exchange', function() {    
     
     test('buy should add a BUY nockmarket order', function(done) {
         exchangeData = exchange.buy(40, 100, exchangeData);
@@ -57,7 +57,14 @@ suite('orderBook', function() {
 
         exchangeData = exchange.sell(40, 1, exchangeData);
         exchangeData.trades[0].price.should.eql(40);
+      // console.log(exchangeData);
         console.log(exchange.getDisplay(exchangeData));
+        
+        
+      //  var cloned = require('jquery').extend(true, {}, exchangeData);
+       // cloned.sells.prices.pop();
+       console.log('here');
+                console.log(exchange.getDisplay(exchangeData));
         done();      
     });     
     
@@ -82,3 +89,19 @@ suite('orderBook', function() {
    
 
 });
+
+
+
+suite('nocklib', function() {
+
+    test('generateRandomOrder should generate a random order', function(done) {
+        var order = nocklib.generateRandomOrder(exchangeData);
+        should.exist(order.type);
+        should.exist(order.price);
+        should.exist(order.volume);
+        done();
+    }); 
+
+});
+    
+    
