@@ -17,7 +17,9 @@ function createExchange(exchangeData) {
     if (!exchange[orderType]) {
       exchange[orderType] = {};
       exchange[orderType].volumes = {};
-      exchange[orderType].prices = createBinaryHeap(orderType);
+      var options = {};
+      if (BUY == orderType) options.max = true;
+      exchange[orderType].prices = createBinaryHeap(options);
     }
   }
 
@@ -39,7 +41,30 @@ module.exports = {
   sell:function (price, volume, exchangeData) {
     return order(SELL, price, volume, exchangeData);
   },
-  order:order
+
+  order:order,
+  
+  getDisplay: function(exchangeData) {
+  
+    var padding = "        | ";      
+    var stringBook = "\n";
+    var buys = exchangeData.buys;
+    var sells = exchangeData.sells;
+    while (sells.prices.size() > 0) {
+      var sellPrice = sells.prices.pop()
+      stringBook = "\n" + padding + sellPrice + ", " + sells.volumes[sellPrice] + stringBook;
+    }
+    while (buys.prices.size() > 0) {
+      var buyPrice = buys.prices.pop();
+      stringBook += buyPrice + ", " + buys.volumes[buyPrice] + "\n";
+    }
+    stringBook += "\n\n";
+    for (var i=0; i<exchangeData.trades.length; i++) {
+      var trade = exchangeData.trades[i];
+      stringBook += "TRADE " + trade.volume + " @ " + trade.price;
+    }
+    return stringBook;
+  }
 
 }
 
@@ -62,8 +87,6 @@ function order(orderType, price, volume, exchangeData) {
   }
   var trade = isTrade();
 
-console.log(price, clonedExchange[getOpposite()].prices.peek(), clonedExchange[getOpposite()].prices.all(), trade);
-
   // A trade means several things
   // 1. The existing order is not added to the book
   // 2. Matching orders on the other side of the book are wiped out
@@ -80,7 +103,6 @@ console.log(price, clonedExchange[getOpposite()].prices.peek(), clonedExchange[g
     while (remainingVolume > 0) {
       var bestOpposingPrice = opposingBook.prices.peek();
       var bestOpposingVolume = opposingBook.volumes[bestOpposingPrice];
-      console.log(bestOpposingPrice, bestOpposingVolume, remainingVolume, price, 11111111111);
       // The order does not wipe out any price levels
       if (bestOpposingVolume > remainingVolume) {
         clonedExchange.trades.push({price:bestOpposingPrice, volume:remainingVolume});
@@ -95,7 +117,6 @@ console.log(price, clonedExchange[getOpposite()].prices.peek(), clonedExchange[g
         // Pop the best price from the heap
         opposingBook.prices.pop();
         delete opposingBook.volumes[bestOpposingPrice];
-        //  console.log(opposingBook, bestOpposingPrice, 9999, remainingVolume, opposingBook.volumes[bestOpposingPrice]);
       }
     }
   }

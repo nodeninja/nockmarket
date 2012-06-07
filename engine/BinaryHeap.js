@@ -1,12 +1,13 @@
 var exchange = require('./exchange');
 
 module.exports = BinaryHeap;
-var BUY = "buys";
-var SELL = "sells";
 
-function BinaryHeap(scoreFunction, orderType){
+function BinaryHeap(scoreFunction, options){
   this.content = [];
-  this.orderType = orderType;
+  if (options)
+    this.options = options;
+  else
+    this.options = {};
   this.scoreFunction = scoreFunction;
 }
 
@@ -16,7 +17,7 @@ BinaryHeap.prototype = {
     return this.content;
   },
   peek: function() {
-    if (BUY == this.orderType)
+    if (this.options.max)
       return -this.content[0];
     else
       return this.content[0];
@@ -24,9 +25,8 @@ BinaryHeap.prototype = {
   
   push: function(element) {
     // Add the new element to the end of the array.
-    if (BUY == this.orderType) {
+    if (this.options.max) {
       this.content.push(-element);
-      console.log(555555555555555, -element);
     }
     else
       this.content.push(element);
@@ -45,7 +45,7 @@ BinaryHeap.prototype = {
       this.content[0] = end;
       this.sinkDown(0);
     }
-    if (BUY == this.orderType)
+    if (this.options.max)
       return -result;
     else
       return result;

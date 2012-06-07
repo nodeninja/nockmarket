@@ -56,8 +56,8 @@ suite('orderBook', function() {
     test('sell should produce trades', function(done) {
 
         exchangeData = exchange.sell(40, 1, exchangeData);
-          console.log(exchangeData);
         exchangeData.trades[0].price.should.eql(40);
+        console.log(exchange.getDisplay(exchangeData));
         done();      
     });     
     
