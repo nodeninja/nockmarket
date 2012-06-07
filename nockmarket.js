@@ -11,13 +11,15 @@ var exchangeData = {}
 function submitRandomOrder() {
 
   var order = nocklib.generateRandomOrder(exchangeData);
+  console.log(order);
+  console.log(exchange.getDisplay(exchangeData));  
   if (order.type == exchange.BUY)
     exchangeData = exchange.buy(order.price, order.volume, exchangeData);
   else  
     exchangeData = exchange.sell(order.price, order.volume, exchangeData);  
 
-  console.log(order);
-  console.log(exchange.getDisplay(exchangeData));
+  if (exchangeData.trades && exchangeData.trades[0] && (!exchangeData.trades[0].price || isNaN(exchangeData.trades[0].price)))
+    process.exit(0)
   
   var pause = Math.floor(Math.random() * timeRange) + timeFloor;
   setTimeout(submitRandomOrder, pause);
