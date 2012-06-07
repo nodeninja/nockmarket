@@ -54,18 +54,18 @@ suite('exchange', function() {
     
           
     test('sell should produce trades', function(done) {
-
         exchangeData = exchange.sell(40, 1, exchangeData);
         exchangeData.trades[0].price.should.eql(40);
-      // console.log(exchangeData);
-        console.log(exchange.getDisplay(exchangeData));
-        
-        
-      //  var cloned = require('jquery').extend(true, {}, exchangeData);
-       // cloned.sells.prices.pop();
-       console.log('here');
-                console.log(exchange.getDisplay(exchangeData));
         done();      
+    });  
+    
+    test('buy should handle wiping of order book', function(done) {
+      exchangeData = {}
+      exchangeData = exchange.buy(36, 104, exchangeData);
+      exchangeData = exchange.sell(32, 119, exchangeData);
+      exchangeData.trades[0].price.should.eql(36);
+      exchangeData.trades.length.should.eql(1);
+      done();      
     });     
     
  

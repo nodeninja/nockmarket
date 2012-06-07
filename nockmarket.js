@@ -16,10 +16,8 @@ function submitRandomOrder() {
   else  
     exchangeData = exchange.sell(order.price, order.volume, exchangeData);  
 
-
-  //console.log(exchange.getDisplay(exchangeData));
-  //console.log(exchangeData);
-  exchange.getDisplay(exchangeData);
+  console.log(order);
+  console.log(exchange.getDisplay(exchangeData));
   
   var pause = Math.floor(Math.random() * timeRange) + timeFloor;
   setTimeout(submitRandomOrder, pause);
