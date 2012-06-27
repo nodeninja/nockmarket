@@ -12,7 +12,13 @@ function createBinaryHeap(orderType) {
 }
 
 function createExchange(exchangeData) {
-
+  
+  var cloned = $.extend(true, {}, exchangeData);
+  cloned.trades = [];
+  init(cloned, BUY);
+  init(cloned, SELL);
+  return cloned;
+  
   function init(exchange, orderType) {
     if (!exchange[orderType]) {
       exchange[orderType] = {};
@@ -23,18 +29,12 @@ function createExchange(exchangeData) {
     }
   }
 
-  var cloned = $.extend(true, {}, exchangeData);
-  cloned.trades = [];
-  init(cloned, BUY);
-  init(cloned, SELL);
-  return cloned;
-
 }
 
 module.exports = {
 
-  BUY:BUY,
-  SELL:SELL,
+  BUY: BUY,
+  SELL: SELL,
   buy:function (price, volume, exchangeData) {
     return order(BUY, price, volume, exchangeData);
   },
@@ -53,8 +53,7 @@ module.exports = {
     var buys = exchangeData.buys;
     var sells = exchangeData.sells;    
 
-    if (sells) {
-      
+    if (sells) {      
       for (var price in sells.volumes) {
         sellPrices.push(price);
       }
@@ -69,7 +68,6 @@ module.exports = {
 
     var padding = "        | ";      
     var stringBook = "\n";
-
 
     while (sellPrices.size() > 0) {
       var sellPrice = sellPrices.pop()
@@ -115,6 +113,7 @@ function order(orderType, price, volume, exchangeData) {
 
   var remainingVolume = volume;
   var storePrice = true;
+  
   if (trade) {
 
     var opposingBook = clonedExchange[BUY]

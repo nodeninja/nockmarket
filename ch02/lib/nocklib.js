@@ -3,8 +3,6 @@
 var exchange = require('./exchange')
   , priceFloor = 35
   , priceRange = 10
-  , timeFloor = 500
-  , timeRange = 1000
   , volumeFloor = 80
   , volumeRange = 40;
 
@@ -21,11 +19,15 @@ module.exports = {
     var sellPriceExists = exchangeData.sells && exchangeData.sells.prices.peek();
     
     if (!buyPriceExists && !sellPriceExists)
-      order.price = Math.floor(Math.random() * priceRange) + priceFloor
-    else if (buyPriceExists) {
+      order.price = Math.floor(Math.random() * priceRange) + priceFloor;
+    else if (buyPriceExists && sellPriceExists) {
+      if (Math.random() > 0.5)
+        order.price = exchangeData.buys.prices.peek();
+      else
+        order.price = exchangeData.sells.prices.peek();
+    } else if (buyPriceExists) {
       order.price = exchangeData.buys.prices.peek();
-    }
-    else {
+    } else {
       order.price = exchangeData.sells.prices.peek();
     }
   
