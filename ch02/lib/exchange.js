@@ -90,8 +90,8 @@ module.exports = {
 function order(orderType, price, volume, exchangeData) {
 
   // Init
-  var clonedExchange = createExchange(exchangeData);
-  var orderBook = clonedExchange[orderType];
+  var cloned = createExchange(exchangeData);
+  var orderBook = cloned[orderType];
 
   var oldVolume = orderBook.volumes[price];
 
@@ -101,8 +101,8 @@ function order(orderType, price, volume, exchangeData) {
     return (BUY == orderType) ? SELL: BUY;
   }
   function isTrade() {
-    var opposite = clonedExchange[getOpposite()].prices.peek();
-    return (BUY == orderType) ? price >= opposite : price <= opposite;
+    var opp = cloned[getOpposite()].prices.peek();
+    return (BUY == orderType) ? price >= opp : price <= opp;
   }
   var trade = isTrade();
 
@@ -111,32 +111,37 @@ function order(orderType, price, volume, exchangeData) {
   // 2. Matching orders on the other side of the book are wiped out
   // 3. Trades are returned in an array
 
-  var remainingVolume = volume;
+  var remVol = volume;
   var storePrice = true;
   
   if (trade) {
 
-    var opposingBook = clonedExchange[BUY]
+    var oppBook = cloned[BUY]
     if (orderType == BUY)
-      opposingBook = clonedExchange[SELL]
+      oppBook = cloned[SELL]
 
-    while (remainingVolume > 0 && Object.keys(opposingBook.volumes).length > 0) {
-      var bestOpposingPrice = opposingBook.prices.peek();
-      var bestOpposingVolume = opposingBook.volumes[bestOpposingPrice];
+    while (remVol > 0 && Object.keys(oppBook.volumes).length > 0) {
+      var bestOppPrice = oppBook.prices.peek();
+      var bestOppVol = oppBook.volumes[bestOppPrice];
       // The order does not wipe out any price levels
-      if (bestOpposingVolume > remainingVolume) {
-        clonedExchange.trades.push({price:bestOpposingPrice, volume:remainingVolume});
-        opposingBook.volumes[bestOpposingPrice] = opposingBook.volumes[bestOpposingPrice] - remainingVolume;
-        remainingVolume = 0;
+      if (bestOppVol > remVol) {
+        cloned.trades.push({price:bestOppPrice, volume:remVol});
+        oppBook.volumes[bestOppPrice] = 
+          oppBook.volumes[bestOppPrice] - remVol;
+        remVol = 0;
         storePrice = false;
       }
       // The order has wiped out the entire other side
       else {
-        clonedExchange.trades.push({price:bestOpposingPrice, volume:opposingBook.volumes[bestOpposingPrice]});
-        remainingVolume = remainingVolume - opposingBook.volumes[bestOpposingPrice];
+      	if (bestOppVol == remVol)
+      	  storePrice = false;     	
+        cloned.trades.push(
+          {price:bestOppPrice
+          , volume:oppBook.volumes[bestOppPrice]});
+        remVol = remVol - oppBook.volumes[bestOppPrice];
         // Pop the best price from the heap
-        opposingBook.prices.pop();
-        delete opposingBook.volumes[bestOpposingPrice];
+        oppBook.prices.pop();
+        delete oppBook.volumes[bestOppPrice];
       }
     }
   }
@@ -144,14 +149,15 @@ function order(orderType, price, volume, exchangeData) {
 
   // We only need to store prices if they are new otherwise we get
   // duplicate prices
-  if (!oldVolume && storePrice) clonedExchange[orderType].prices.push(price);
+  if (!oldVolume && storePrice) 
+    cloned[orderType].prices.push(price);
 
-  var newVolume = remainingVolume;
+  var newVolume = remVol;
 
   // Add to existing volume
   if (oldVolume) newVolume += oldVolume;
   if (newVolume > 0)
     orderBook.volumes[price] = newVolume;
-  return clonedExchange;
+  return cloned;
 
 }
