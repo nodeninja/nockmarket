@@ -111,7 +111,7 @@ function order(orderType, price, volume, exchangeData) {
   // 2. Matching orders on the other side of the book are wiped out
   // 3. Trades are returned in an array
 
-  var remVol = volume;
+  var remainingVolume = volume;
   var storePrice = true;
   
   if (trade) {
@@ -120,25 +120,25 @@ function order(orderType, price, volume, exchangeData) {
     if (orderType == BUY)
       oppBook = cloned[SELL]
 
-    while (remVol > 0 && Object.keys(oppBook.volumes).length > 0) {
+    while (remainingVolume > 0 && Object.keys(oppBook.volumes).length > 0) {
       var bestOppPrice = oppBook.prices.peek();
       var bestOppVol = oppBook.volumes[bestOppPrice];
       // The order does not wipe out any price levels
-      if (bestOppVol > remVol) {
-        cloned.trades.push({price:bestOppPrice, volume:remVol});
+      if (bestOppVol > remainingVolume) {
+        cloned.trades.push({price:bestOppPrice, volume:remainingVolume});
         oppBook.volumes[bestOppPrice] = 
-          oppBook.volumes[bestOppPrice] - remVol;
-        remVol = 0;
+          oppBook.volumes[bestOppPrice] - remainingVolume;
+        remainingVolume = 0;
         storePrice = false;
       }
       // The order has wiped out the entire other side
       else {
-      	if (bestOppVol == remVol)
+      	if (bestOppVol == remainingVolume)
       	  storePrice = false;     	
         cloned.trades.push(
           {price:bestOppPrice
           , volume:oppBook.volumes[bestOppPrice]});
-        remVol = remVol - oppBook.volumes[bestOppPrice];
+        remainingVolume = remainingVolume - oppBook.volumes[bestOppPrice];
         // Pop the best price from the heap
         oppBook.prices.pop();
         delete oppBook.volumes[bestOppPrice];
@@ -152,7 +152,7 @@ function order(orderType, price, volume, exchangeData) {
   if (!oldVolume && storePrice) 
     cloned[orderType].prices.push(price);
 
-  var newVolume = remVol;
+  var newVolume = remainingVolume;
 
   // Add to existing volume
   if (oldVolume) newVolume += oldVolume;
