@@ -1,0 +1,28 @@
+link(href='http://twitter.github.com/bootstrap/assets/css/bootstrap.css', rel='stylesheet')
+link(href='http://nodeninja.github.com/book/chapter02/docs.css', rel='stylesheet')
+script(type='text/javascript', src='http://nodeninja.github.com/book/chapter02/jquery.js')
+script(type='text/javascript', src='http://nodeninja.github.com/book/chapter02/bootstrap-button.js')
+script(type='text/javascript', src='http://nodeninja.github.com/book/chapter02/bootstrap-modal.js')
+script(type='text/javascript', src='http://nodeninja.github.com/book/chapter02/bootstrap-transition.js')
+
+#myModal.modal.hide.fade.smallModal
+  .modal-header
+    a.close(data-dismiss='modal')
+    h3 Sign Up Today
+  .modal-body
+    form#signup-form.form-horizontal(action='/signup', method='post')
+      fieldset
+        .control-group
+          input.input-xlarge.uname(type='text', name='username', placeholder='Username')         
+          span#imagePlaceHolder
+        .control-group
+          input.input-xlarge(type='text', name='email', placeholder='Email')
+        .control-group
+          input.input-xlarge(type='password', name='password', placeholder='Password')
+  .modal-footer
+    a.btn(href='#', data-dismiss='modal') Close
+    a.btn.btn-primary.create-button(href='#') Create Account
+header.jumbotron.masthead
+  .inner
+  p.download-info
+    a.btn.btn-primary.btn-large(data-toggle='modal', href='#myModal') Sign Up
