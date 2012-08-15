@@ -5,7 +5,7 @@ var db = require('./lib/db')
   , exch = require('./lib/exchange')
   , express = require('express')
   , nocklib = require('./lib/nocklib')
-  , stocks = ['NOCK1'] 
+  , nockroutes = require('./routes/nockroutes.js')
   , timeFloor = 500
   , timeRange = 1000
   , _ = require('underscore');
@@ -14,7 +14,7 @@ function submitRandomOrder() {
   
   // order
   var ord = nocklib.generateRandomOrder(exchangeData); 
-  console.log('order', ord);
+  //console.log('order', ord);
   if (ord.type == exch.BUY)
     exchangeData = exch.buy(ord.price, ord.volume, exchangeData);
   else  
@@ -38,14 +38,16 @@ function submitRandomOrder() {
   function pauseThenTrade() { 
     var pause = Math.floor(Math.random() * timeRange) + timeFloor;
     setTimeout(submitRandomOrder, pause);
-    console.log(exch.getDisplay(exchangeData));      
+    //console.log(exch.getDisplay(exchangeData));      
   }
 
 }
 
 var app = express.createServer();
 app.configure(function () {
-    app.use(express.bodyParser());
+    app.use(express.bodyParser());    
+    app.use(express.cookieParser());
+    app.use(express.session({secret: 'secretpasswordforsessions'}));    
     app.set('views', __dirname + '/views');
     app.set('view engine', 'ejs');
     app.use(express.static(__dirname + '/public')); 
@@ -55,19 +57,7 @@ app.set('view options', {
     layout:false
 });
 
-app.get('/', function(req, res) {
-	res.render('index');
-});
-
-app.get('/api/user/:username', function(req, res) {
-    nocklib.getUser(req.params.username, function(err, user) {
-        console.log(user);
-        if (user)
-            res.send('1');
-        else
-            res.send('0');
-    });
-});
+app.get('/', nockroutes.getIndex);
 
 app.get('/api/trades', function(req, res) {
 	db.find('transactions'
@@ -94,33 +84,15 @@ app.get('/api/trades', function(req, res) {
 		res.json(json);
 	});
 });
-
-app.get('/portfolio', function(req, res) {
-    res.render('portfolio');
-});
-
-app.post('/signin', function(req, res) {
-    nocklib.authenticate(req.body.username
-                        , req.body.password, function(err, valid) {
-        if (valid)        
-            res.redirect('/portfolio');
-        else
-            res.redirect('/');
-    });    
-});
-app.post('/signup', function(req, res) {
-    nocklib.createUser(req.body.username
-                        , req.body.email
-                        , req.body.password, function(err, user) {
-        console.log(user);
-        res.redirect('/portfolio');
-    });
-    
-});
+app.get('/api/user/:username', nockroutes.getUser);
+app.get('/portfolio', nocklib.ensureAuthenticated, nockroutes.portfolio);
+app.post('/add-stock', nockroutes.addStock);  
+app.post('/signin', nockroutes.signin);
+app.post('/signup', nockroutes.signup); 
 
 db.open(function() {	
 	app.listen(3000); 
-  //	submitRandomOrder();  
+  	submitRandomOrder();  
 });
 
 	
