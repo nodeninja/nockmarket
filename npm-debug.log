@@ -1,25 +1,23 @@
-info it worked if it ends with ok
-verbose cli [ 'node', '/usr/bin/npm', 'install' ]
-info using npm@1.1.21
-info using node@v0.6.18
-verbose /usr/bin/node node symlink
-verbose config file /home/owner/.npmrc
-verbose config file /usr/etc/npmrc
-verbose config file /usr/lib/nodejs/npm/npmrc
-ERR! Couldn't read dependencies.
-ERR! Error: ENOENT, open '/home/owner/package.json'
-ERR! You may report this log at:
-ERR!     <http://github.com/isaacs/npm/issues>
-ERR! or email it to:
-ERR!     <npm-@googlegroups.com>
-ERR! 
-ERR! System Linux 3.0.0-14-generic-pae
-ERR! command "node" "/usr/bin/npm" "install"
-ERR! cwd /home/owner/WebstormProjects/nockmarket
-ERR! node -v v0.6.18
-ERR! npm -v 1.1.21
-ERR! path /home/owner/package.json
-ERR! code ENOENT
-ERR! message ENOENT, open '/home/owner/package.json'
-ERR! errno {}
-verbose exit [ 1, true ]
+0 info it worked if it ends with ok
+1 verbose cli [ 'nodejs', '/usr/bin/npm', 'install' ]
+2 info using npm@1.1.44
+3 info using node@v0.8.3
+4 verbose config file /home/owner/.npmrc
+5 verbose config file /usr/etc/npmrc
+6 verbose config file /usr/lib/nodejs/npm/npmrc
+7 verbose read json /home/owner/package.json
+8 error install Couldn't read dependencies
+9 error Error: ENOENT, open '/home/owner/package.json'
+10 error If you need help, you may report this log at:
+10 error     <http://github.com/isaacs/npm/issues>
+10 error or email it to:
+10 error     <npm-@googlegroups.com>
+11 error System Linux 3.0.0-14-generic-pae
+12 error command "nodejs" "/usr/bin/npm" "install"
+13 error cwd /home/owner/WebstormProjects/nockmarket
+14 error node -v v0.8.3
+15 error npm -v 1.1.44
+16 error path /home/owner/package.json
+17 error code ENOENT
+18 error errno 34
+19 verbose exit [ 34, true ]

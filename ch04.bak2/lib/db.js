@@ -9,20 +9,20 @@ var envHost = process.env['MONGO_NODE_DRIVER_HOST']
 
 var db = new Db('nockmarket'
           , new Server(host, port, {})
-          , {native_parser:false}); 
+          , {native_parser:false});
 
 module.exports = {
 
     find: function(name, query, limit, callback) {
       db.collection(name).find(query)
-      				.sort({_id: -1})
-      				.limit(limit)
-      				.toArray(callback);
+      						.sort({_id: -1})
+      						.limit(limit)
+      						.toArray(callback);
     },
     
     findOne: function(name, query, callback) {
         db.collection(name).findOne(query, callback);
-    },  
+    },       
 
     insert: function(name, items, callback) {
         db.collection(name).insert(items, callback);
@@ -32,9 +32,14 @@ module.exports = {
         module.exports.insert(name, item, function(err, items) {
           callback(err, items[0]);
         });
-    },                       
-
+    },    
+    
     open: function(callback) {
       db.open(callback);
-    } 
-} 
+    },
+    
+    push: function(name, id, updateQuery, callback) {
+        db.collection(name).update({_id: id}, {$push: updateQuery}, {safe:true}, callback);      
+    },    
+    
+}

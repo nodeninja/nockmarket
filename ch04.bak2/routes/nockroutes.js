@@ -5,13 +5,13 @@ module.exports = {
     addStock: function(req, res) {
         if (req.xhr) {    
             nocklib.addStock(req.session._id, req.body.stock, function(err, price) {
+                console.log(price);
                 res.send(price);
             });
         }
         
     }, 
-    
-    
+
     getIndex: function(req, res) {
         res.render('index');
     },
@@ -23,21 +23,16 @@ module.exports = {
             else
                 res.send('0');
         });
-    }, 
+    },
     
     portfolio: function(req, res) {
         nocklib.getUserById(req.session._id, function(err, user) {
-            var portfolio = [];
-            if (user && user.portfolio)
-                portfolio = user.portfolio;
-            nocklib.getStockPrices(portfolio, function(err, prices) {
-                res.render('portfolio', {portfolio: portfolio, prices: prices});
+            nocklib.getStockPrices(user.portfolio, function(err, prices) {
+                res.render('portfolio', {portfolio: user.portfolio, prices: prices});
             });
              
         });
-
     },
-    
     
     signin: function(req, res) {
         nocklib.authenticate(req.body.username
@@ -50,9 +45,9 @@ module.exports = {
                 res.redirect('/');
         });    
     },
-    
-    
+
     signup: function(req, res) {
+        console.log('signup');
         nocklib.createUser(req.body.username
                             , req.body.email
                             , req.body.password, function(err, user) {
@@ -60,6 +55,5 @@ module.exports = {
             res.redirect('/portfolio');
         });        
     }
-    
 
 }

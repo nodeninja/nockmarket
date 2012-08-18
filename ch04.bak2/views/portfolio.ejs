@@ -23,7 +23,7 @@
 
             <div class="tabbable" style="margin-bottom: 18px;">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#tab1" data-toggle="tab">Portfolio</a></li>
+                    <li class="active"><a href="#tab1" data-toggle="tab">Portfloio</a></li>
                     <li><a href="#tab2" data-toggle="tab">Nockmarket</a></li>
                 </ul>
                 <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
@@ -40,11 +40,9 @@
                             </tr>
                             </thead>
                             <tbody class="stock-list">
-<% for (var i=0; i<portfolio.length; i++) { %>
-<tr><td><%=portfolio[i]%></td>
-<td><%=prices[i]%></td></tr>
-<% } %>
-
+                            <% for (var i=0; i<portfolio.length; i++) { %>
+                                <tr><td><%=portfolio[i]%></td><td><%=prices[i]%></td></tr>
+                            <% } %>
                             </tbody>
                         </table>
                     </div>

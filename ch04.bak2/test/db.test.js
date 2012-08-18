@@ -5,7 +5,7 @@ var assert = require('assert')
 
 var exchangeData = {};
 
-suite('exchange', function() {    
+suite('database', function() {    
     
     var insertedOrder; 
     test('open should open database connection', function(done) {

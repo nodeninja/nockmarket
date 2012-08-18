@@ -26,6 +26,7 @@ module.exports = {
     }, 
     
     portfolio: function(req, res) {
+        console.log(req.sessionID);
         nocklib.getUserById(req.session._id, function(err, user) {
             var portfolio = [];
             if (user && user.portfolio)

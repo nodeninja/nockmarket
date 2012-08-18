@@ -1,14 +1,21 @@
 'use strict';
 
-var crypto = require('crypto')
+var connect = require('connect')
+  , cookie = require('cookie')
+  , crypto = require('crypto')
   , db = require('./db')
   , exchange = require('./exchange')
+  , express = require('express')  
   , http = require('http')  
+  , MemoryStore = express.session.MemoryStore  
   , ObjectID = require('mongodb').ObjectID  
+  , parseCookie = require('connect').utils.parseCookie
   , priceFloor = 35
   , priceRange = 10
   , volFloor = 80
   , volRange = 40;
+
+var sessionStore = new MemoryStore();
 
 module.exports = {
 
@@ -42,6 +49,38 @@ module.exports = {
       }); 
   }, 
     
+  createSocket: function(app) {
+    var io = require('socket.io').listen(app);  
+    io.configure(function (){
+      io.set('authorization', function (handshakeData, callback) {
+        if (handshakeData.headers.cookie) {
+            console.log(1111, handshakeData.headers.cookie, cookie.parse(decodeURIComponent(handshakeData.headers.cookie)));
+            handshakeData.cookie = cookie.parse(decodeURIComponent(handshakeData.headers.cookie));
+            handshakeData.sessionID = handshakeData.cookie['express.sid'];
+            console.log(2222, handshakeData.cookie, handshakeData.sessionID);
+            sessionStore.get(handshakeData.sessionID, function (err, session) {
+                if (err || !session) {
+                    return callback(null, false);
+                } else {
+                    // save the session data and accept the connection
+                    handshakeData.session = session;
+                    console.log(99999, session);
+                }
+            });    
+        }
+        else {
+          return callback(null, false);    
+        }
+        callback(null, true); // error first callback style 
+      });
+    });    
+    io.sockets.on('connection', function (socket) {
+      socket.emit('news', { hello: 'world' });
+      socket.on('joined', function (data) {
+        console.log('joined to');
+      });
+    });   
+  },
     
   createUser: function(username, email, password, callback) {
       
@@ -91,6 +130,10 @@ module.exports = {
       order.price -= shift;
     order.volume = Math.floor(Math.random() * volRange) + volFloor
     return order;
+  },
+
+  getSessionStore: function() {
+      return sessionStore;
   },
 
   getStockPrices: function(stocks, callback) {

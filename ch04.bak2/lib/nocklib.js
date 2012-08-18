@@ -2,7 +2,7 @@
 
 var crypto = require('crypto')
   , db = require('./db')
-  , exchange = require('./exchange')
+, exchange = require('./exchange')
   , http = require('http')  
   , ObjectID = require('mongodb').ObjectID  
   , priceFloor = 35
@@ -11,27 +11,28 @@ var crypto = require('crypto')
   , volRange = 40;
 
 module.exports = {
-
+    
   addStock: function(uid, stock, callback) {  
       
-    function doCallback() {
+      function doCallback() {
           counter++;
           if (counter == 2) {
               callback(null, price);
           }
-      }            
+      }
+            
       var counter = 0;
-
-      var price;
+      var price;      
       
       module.exports.getStockPrices([stock], function(err, retrieved) {   
           price = retrieved[0];
           doCallback();
-      });      
+      });
+      
       db.push('users', uid, {portfolio: stock}, doCallback);       
       
   },
-
+    
   authenticate: function(username, password, callback) {
       
       db.findOne('users', {username: username}, function(err, user) {
@@ -42,7 +43,7 @@ module.exports = {
       }); 
   }, 
     
-    
+
   createUser: function(username, email, password, callback) {
       
     var user = {username: username
@@ -51,13 +52,14 @@ module.exports = {
     db.insertOne('users', user, callback);     
   },
   
+  // Middleware to ensure that requests are authenticated
   ensureAuthenticated: function (req, res, next) {
     if (req.session._id) {
       return next();
     }
     res.redirect('/');
-  },    
-  
+  },
+
   generateRandomOrder: function(exchangeData) {
     var order = {};
     if (Math.random() > 0.5)
@@ -91,8 +93,8 @@ module.exports = {
       order.price -= shift;
     order.volume = Math.floor(Math.random() * volRange) + volFloor
     return order;
-  },
-
+  }, 
+  
   getStockPrices: function(stocks, callback) {
     var stockList = '';
     stocks.forEach(function(stock) {
@@ -123,21 +125,20 @@ module.exports = {
                 prices.push(price);
           });
           
-        callback(null, prices);
+          callback(null, prices);
       });  
     });  
     
   },
   
-  getUserById: function(id, callback) {
-    db.findOne('users', {_id: new ObjectID(id)}, callback);
-  },     
   
-
-   getUser: function(username, callback) {
+  getUser: function(username, callback) {
     db.findOne('users', {username: username}, callback);
   }, 
- 
+
+  getUserById: function(id, callback) {
+    db.findOne('users', {_id: new ObjectID(id)}, callback);
+  }, 
      
 }
 

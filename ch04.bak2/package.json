@@ -7,11 +7,9 @@
     "npm":  "1.1.9"
   }
   , "dependencies": {
-  	 "ejs" : "0.7.1"
-  	, 	"express": "2.5.8"   	
-   ,   "jquery" : "1.7.2"
+  	"dnode" : "1.0.0"
+     , "jquery" : "1.7.2"
     , "mocha": "1.0.1"
-    , 	"mongodb": "1.0.2"    
     , "should": "0.6.1"     
   }
 }

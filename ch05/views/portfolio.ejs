@@ -13,6 +13,8 @@
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-transition.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
     <script type="text/javascript" src="/javascripts/portfolio.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/chat.js"></script>
 </head>
 <body>
 <div class="container">
@@ -25,6 +27,7 @@
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#tab1" data-toggle="tab">Portfolio</a></li>
                     <li><a href="#tab2" data-toggle="tab">Nockmarket</a></li>
+                    <li><a href="#tab3" data-toggle="tab" id="chat-tab">Chat</a></li>
                 </ul>
                 <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
                     <div class="tab-pane active" id="tab1">
@@ -50,6 +53,12 @@
                     </div>
                     <div class="tab-pane" id="tab2">
                         <p>Howdy, I'm in Section 2.</p>
+                    </div>
+                    <div class="tab-pane" id="tab3">
+                        <p><textarea class="input-xlarge span8" id="textarea" rows="20"></textarea></p>
+                        <p><input type="text" class="input-xlarge span8" id="input01" placeholder="Enter your message"></p>
+                        <p><button type="submit" class="btn btn-primary">Send</button></p>
+                        
                     </div>
                 </div>
             </div>
