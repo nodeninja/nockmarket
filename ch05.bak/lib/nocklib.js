@@ -1,19 +1,21 @@
 'use strict';
 
-var cookie = require('cookie')
+var connect = require('connect')
+  , cookie = require('cookie')
   , crypto = require('crypto')
   , db = require('./db')
   , exchange = require('./exchange')
   , express = require('express')  
   , http = require('http')  
-  , MemoryStore = express.session.MemoryStore    
+  , MemoryStore = express.session.MemoryStore  
   , ObjectID = require('mongodb').ObjectID  
+  , parseCookie = require('connect').utils.parseCookie
   , priceFloor = 35
   , priceRange = 10
   , volFloor = 80
   , volRange = 40;
-  
-var sessionStore = new MemoryStore();  
+
+var sessionStore = new MemoryStore();
 
 module.exports = {
 
@@ -53,40 +55,29 @@ module.exports = {
       io.set('authorization', function (handshakeData, callback) {
         if (handshakeData.headers.cookie) {
             handshakeData.cookie = cookie.parse(decodeURIComponent(handshakeData.headers.cookie));
-            handshakeData.sessionID = handshakeData.cookie['connect.sid'];
+            handshakeData.sessionID = handshakeData.cookie['express.sid'];
             sessionStore.get(handshakeData.sessionID, function (err, session) {
                 if (err || !session) {
                     return callback(null, false);
                 } else {
                     handshakeData.session = session;
                     console.log('session data', session);
-                    return callback(null, true); 
                 }
             });    
         }
         else {
           return callback(null, false);    
         }
-        
+        callback(null, true); // error first callback style 
       });
-        
-    }); 
-    
-    io.sockets.on('connection', function (socket) {
-      socket.on('joined', function (data) {
-        var message = 'Admin: ' + socket.handshake.session.username + ' has joined\n';
-        socket.emit('chat', { message: message});
-        socket.broadcast.emit('chat', { message: message});
-        
-      });
-      socket.on('clientchat', function (data) {
-        var message = socket.handshake.session.username + ': ' + data.message + '\n';
-        socket.emit('chat', { message: message});
-        socket.broadcast.emit('chat', { message: message});        
-      });      
     });    
+    io.sockets.on('connection', function (socket) {
+      socket.emit('news', { hello: 'world' });
+      socket.on('joined', function (data) {
+        console.log('joined to');
+      });
+    });   
   },
-    
     
   createUser: function(username, email, password, callback) {
       
@@ -137,7 +128,7 @@ module.exports = {
     order.volume = Math.floor(Math.random() * volRange) + volFloor
     return order;
   },
-  
+
   getSessionStore: function() {
       return sessionStore;
   },

@@ -26,6 +26,7 @@ module.exports = {
     }, 
     
     portfolio: function(req, res) {
+        console.log(req.sessionID);
         nocklib.getUserById(req.session._id, function(err, user) {
             var portfolio = [];
             if (user && user.portfolio)
@@ -44,7 +45,6 @@ module.exports = {
                             , req.body.password, function(err, id) {
             if (id) {    
                 req.session._id = id;
-                req.session.username = req.body.username;
                 res.redirect('/portfolio');
             }
             else

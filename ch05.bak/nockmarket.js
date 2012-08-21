@@ -4,7 +4,6 @@ var db = require('./lib/db')
   , exchangeData = {}
   , exch = require('./lib/exchange')
   , express = require('express')
-  , io = require('socket.io')
   , nocklib = require('./lib/nocklib')
   , nockroutes = require('./routes/nockroutes.js')  
   , stocks = ['NOCK1'] 
@@ -49,7 +48,9 @@ var app = express.createServer();
 app.configure(function () {
     app.use(express.bodyParser());
     app.use(express.cookieParser());
-    app.use(express.session({secret: 'secretpasswordforsessions', store: nocklib.getSessionStore()}));
+    app.use(express.session({secret: 'secretpasswordforsessions'
+                            , key: 'express.sid'
+                            , store: nocklib.getSessionStore()}));
     app.set('views', __dirname + '/views');
     app.set('view engine', 'ejs');
     app.use(express.static(__dirname + '/public')); 
