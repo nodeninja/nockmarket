@@ -27,6 +27,7 @@ function submitRandomOrder() {
         trade.init = (ord.type == exch.BUY) ? 'b' : 's';
         return trade;
       });
+      nocklib.sendTrades(trades);
       db.insert('transactions', trades, function(err, trades) {
         pauseThenTrade();
       });

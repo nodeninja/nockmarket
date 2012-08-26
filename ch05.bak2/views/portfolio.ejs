@@ -15,6 +15,8 @@
     <script type="text/javascript" src="/javascripts/portfolio.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/javascripts/chat.js"></script>
+    <script src="/javascripts/trades.js"></script>
+    <script src="/javascripts/account.js"></script>
 </head>
 <body>
 <div class="container">
@@ -28,6 +30,7 @@
                     <li class="active"><a href="#tab1" data-toggle="tab">Portfolio</a></li>
                     <li><a href="#tab2" data-toggle="tab">Nockmarket</a></li>
 <li><a href="#tab3" data-toggle="tab" id="chat-tab">Chat</a></li>
+<li><a href="#tab4" data-toggle="tab">My Account</a></li>
                 </ul>
                 <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
                     <div class="tab-pane active" id="tab1">
@@ -61,7 +64,13 @@
 <p><textarea class="input-xlarge span8" id="textarea" rows="20"></textarea></p>
 <p><input type="text" class="input-xlarge span8" id="input01" placeholder="Enter your message"></p>
 <p><button type="submit" class="btn btn-primary" id="send-chat">Send</button></p>
+<p><span class="label label-inverse" id="online">Online:</span><div id="users"></div></p>
 </div>
+<div class="tab-pane" id="tab4">
+<p><input type="text" class="input-xlarge span8" id="email" value="<%=email%>"></p>
+<p><button type="submit" class="btn btn-primary" id="update-account">Update</button></p>
+</div>
+
 
                 </div>
             </div>

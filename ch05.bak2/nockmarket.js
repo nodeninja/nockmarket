@@ -7,27 +7,34 @@ var db = require('./lib/db')
   , io = require('socket.io')
   , nocklib = require('./lib/nocklib')
   , nockroutes = require('./routes/nockroutes.js')  
-  , stocks = ['NOCK1'] 
   , timeFloor = 500
   , timeRange = 1000
   , _ = require('underscore');
 
-function submitRandomOrder() {
+var stocks = ['NOCK1', 'NOCK2', 'NOCK3', 'NOCK4', 'NOCK5'];
+var allData = [];
+stocks.forEach(function(stock) {allData.push({});});
+
+function submitRandomOrder(index) {
   
   // order
+  var exchangeData = allData[index];
   var ord = nocklib.generateRandomOrder(exchangeData); 
+  ord.stock = stocks[index];
   //console.log('order', ord);
   if (ord.type == exch.BUY)
-    exchangeData = exch.buy(ord.price, ord.volume, exchangeData);
+    allData[index] = exch.buy(ord.price, ord.volume, exchangeData);
   else  
-    exchangeData = exch.sell(ord.price, ord.volume, exchangeData);  
+    allData[index] = exch.sell(ord.price, ord.volume, exchangeData);  
 
   db.insertOne('transactions', ord, function(err, order) {
-    if (exchangeData.trades) {
+    if (exchangeData.trades && exchangeData.trades.length > 0) {
       var trades = exchangeData.trades.map(function(trade) {
         trade.init = (ord.type == exch.BUY) ? 'b' : 's';
+        trade.stock = stocks[index];
         return trade;
       });
+      nocklib.sendTrades(exchangeData.trades);
       db.insert('transactions', trades, function(err, trades) {
         pauseThenTrade();
       });
@@ -39,7 +46,7 @@ function submitRandomOrder() {
     
   function pauseThenTrade() { 
     var pause = Math.floor(Math.random() * timeRange) + timeFloor;
-    setTimeout(submitRandomOrder, pause);
+    setTimeout(submitRandomOrder.bind(this, index), pause);
     //console.log(exch.getDisplay(exchangeData));      
   }
 
@@ -94,7 +101,9 @@ app.get('/api/trades', function(req, res) {
 db.open(function() {	
     nocklib.createSocket(app);
 	app.listen(3000); 
-  	submitRandomOrder();  
+  	for (var i=0; i<stocks.length; i++) { 
+        submitRandomOrder(i);
+    }
 });
 
 	

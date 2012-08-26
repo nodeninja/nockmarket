@@ -13,7 +13,10 @@ var cookie = require('cookie')
   , volFloor = 80
   , volRange = 40;
   
+  
 var sessionStore = new MemoryStore();  
+var io;
+var online = [];
 
 module.exports = {
 
@@ -48,7 +51,7 @@ module.exports = {
   }, 
     
   createSocket: function(app) {
-    var io = require('socket.io').listen(app);  
+    io = require('socket.io').listen(app);  
     io.configure(function (){
       io.set('authorization', function (handshakeData, callback) {
         if (handshakeData.headers.cookie) {
@@ -74,17 +77,32 @@ module.exports = {
     
     io.sockets.on('connection', function (socket) {
       socket.on('joined', function (data) {
+          console.log('join');
         var message = 'Admin: ' + socket.handshake.session.username + ' has joined\n';
-        socket.emit('chat', { message: message});
-        socket.broadcast.emit('chat', { message: message});
+        online.push(socket.handshake.session.username);
+        socket.emit('chat', { message: message, users: online});
+        socket.broadcast.emit('chat', {message: message, username: socket.handshake.session.username});
         
       });
       socket.on('clientchat', function (data) {
         var message = socket.handshake.session.username + ': ' + data.message + '\n';
         socket.emit('chat', { message: message});
         socket.broadcast.emit('chat', { message: message});        
-      });      
-    });    
+      });  
+      socket.on('disconnect', function (data) {
+        var username = socket.handshake.session.username;
+        var index = online.indexOf(username);
+        online.splice(index, 1);          
+        socket.broadcast.emit('disconnect', { username: username});
+      });
+      socket.on('updateAccount', function (data) {       
+          module.exports.updateEmail(socket.handshake.session._id, data.email, function(err, numUpdates) {
+              // Send a response back to the client here
+              socket.emit('updateSuccess', {}); 
+            });
+      });  
+    }); 
+;    
   },
     
     
@@ -185,9 +203,16 @@ module.exports = {
 
    getUser: function(username, callback) {
     db.findOne('users', {username: username}, callback);
-  }, 
- 
-     
+  },
+  
+  sendTrades: function(trades) {
+     // io.sockets.emit('trade', JSON.stringify(trades));
+  },
+  
+  updateEmail: function(id, email, callback) {
+    db.updateById('users', new ObjectID(id), {email: email}, callback);      
+  }
+
 }
 
 function encryptPassword(plainText) {
