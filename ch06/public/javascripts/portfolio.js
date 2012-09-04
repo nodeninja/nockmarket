@@ -10,6 +10,13 @@ $(document).ready(function() {
     });
 
     var PortfolioModel = Backbone.Model.extend({
+        defaults: {
+            visible: true
+        },
+
+        setVisible: function(visible) {
+            this.set({visible: visible});
+        }
     });
     
     var PortfolioCollection = Backbone.Collection.extend({
@@ -24,11 +31,21 @@ $(document).ready(function() {
         el: 'body', 
         
         events: {
-            'click .add-filter': 'done'
+            'click .add-filter': 'filter'
         },
         
-        done: function() {
-            alert('clicked');
+        filter: function() {
+            var filterString = $('#filter').val();
+            var data = window.portfolioCollection.models;
+            for (var i=0; i<data.length; i++) {
+                if (data[i].toJSON().stock.toLowerCase().indexOf(filterString.toLowerCase()) == -1) {
+                   // console.log(data[i].toJSON().stock);
+                    data[i].setVisible(false);
+                }
+                else
+                    data[i].setVisible(true);
+            }            
+           // alert(filterString);
         },
 
         initialize: function() {
@@ -46,12 +63,15 @@ $(document).ready(function() {
         },
         
         render: function() {
-            var template = _.template("<tr><td><%=stock%></td><td><%=price%></td></tr>");
-            var stocks = window.portfolioCollection.models[0].attributes.portfolio;
-            var prices = window.portfolioCollection.models[0].attributes.prices;
-            for (var i=0; i<stocks.length; i++) {
-                var data = {stock: stocks[i], price: prices[i]};
-                $('.stock-list').append(template(data));
+
+            for (var i=0; i<window.portfolioCollection.models.length; i++) {
+                var data = window.portfolioCollection.models[i];
+               // console.log(11, data.toJSON());
+                var rowView = new RowView({model: data});
+              //  rowView.render();
+               // console.log(rowView.render().el);
+               $('.stock-list').append(rowView.render().el);  
+                
             }
         }
 
@@ -62,11 +82,23 @@ $(document).ready(function() {
         tagName: 'tr', 
 
         initialize: function() {
-
+            _.bindAll(this, 'toggle');
+            this.model.bind('change', this.toggle);
+        },
+        
+        toggle: function() {
+            if (!this.model.toJSON().visible)
+                $(this.el).hide();
+            else
+                $(this.el).show();
         },
         
         render: function() {
-            
+            console.log('rdring');
+            var template = _.template("<td><%=stock%></td><td><%=price%></td>");
+            //$('.stock-list').append(template(this.model.toJSON()));  
+            $(this.el).html(template(this.model.toJSON()));
+            return this;
         }
 
     });    
