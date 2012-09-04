@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Nockmarket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="http://nodeninja.github.com/book/chapter02/docs.css" rel="stylesheet">
+    <script src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/jquery.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-button.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-modal.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
+    <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+    <script src="http://backbonejs.org/backbone-min.js"></script>
+    <script type="text/javascript" src="/javascripts/portfolio.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/chat.js"></script>
+<script src="/javascripts/trades.js"></script>
+<script src="/javascripts/account.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="offset2 span8">
+            <h3>Welcome to the Nockmarket</h3>
+            <p>Here you can manage your portfolio and view live prices.</p>
+
+            <div class="tabbable" style="margin-bottom: 18px;">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab1" data-toggle="tab">Portfolio</a></li>
+                    <li><a href="#tab2" data-toggle="tab">Nockmarket</a></li>
+<li><a href="#tab3" data-toggle="tab" id="chat-tab">Chat</a></li>
+<li><a href="#tab4" data-toggle="tab">My Account</a></li>
+                </ul>
+                <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
+                    <div class="tab-pane active" id="tab1">
+                        <div class="well form-search">
+                            <input id="stock" type="text" class="input-medium search-query" name="stock">
+                            <button id="add-stock" class="btn">Add Stock</button>
+                            <hr />
+                            <input id="filter" type="text" class="input-medium search-query" name="filter">
+                            <button class="btn add-filter">Filter</button>
+                        </div>
+                        <table class="table table-striped table-bordered table-condensed">
+                            <thead>
+                            <tr>
+                                <th>Stock Code</th>
+                                <th>Last Price</th>
+                            </tr>
+                            </thead>
+                            <tbody class="stock-list">
+<!-- delete everything here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="tab2">
+<table class="table table-bordered table-condensed">
+    <thead>
+        <tr>
+            <th>Stock</th>
+            <th>BID5</th>
+            <th>BID4</th>
+            <th>BID3</th>
+            <th>BID2</th>
+            <th>BID1</th>
+            <th>Trade</th>
+            <th>ASK1</th>
+            <th>ASK2</th>
+            <th>ASK3</th>
+            <th>ASK4</th>
+            <th>ASK5</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-inverse">NOCK1</span></td>
+            <td><a class="btn btn-primary btn-mini"><strong>20.4</strong><br />2004</a></td>
+            <td><a class="btn btn-primary btn-mini"><strong>20.9</strong><br />1932</a></td>
+            <td><a class="btn btn-primary btn-mini"><strong>21.2</strong><br />429</a></td>
+            <td><a class="btn btn-primary btn-mini"><strong>22.0</strong><br />6244</a></td>
+            <td><a class="btn btn-primary btn-mini"><strong>22.5</strong><br />397</a></td>
+            <td><a class="btn btn-success btn-mini"><strong>23.2</strong><br />142</a></td>
+            <td><a class="btn btn-danger btn-mini"><strong>23.5</strong><br />4286</a></td>
+            <td><a class="btn btn-danger btn-mini"><strong>23.9</strong><br />1972</a></td>
+            <td><a class="btn btn-danger btn-mini"><strong>24.4</strong><br />942</a></td>
+            <td><a class="btn btn-danger btn-mini"><strong>24.9</strong><br />896</a></td>
+            <td><a class="btn btn-danger btn-mini"><strong>25.1</strong><br />325</a></td>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+                    </div>
+<div class="tab-pane" id="tab3">
+<p><textarea class="input-xlarge span8" id="textarea" rows="20"></textarea></p>
+<p><input type="text" class="input-xlarge span8" id="input01" placeholder="Enter your message"></p>
+<p><button type="submit" class="btn btn-primary" id="send-chat">Send</button></p>
+<p><span class="label label-inverse" id="online">Online:</span><div id="users"></div></p>
+</div>
+<div class="tab-pane" id="tab4">
+<p><input type="text" class="input-xlarge span8" id="email" value="<%=email%>"></p>
+<p><button type="submit" class="btn btn-primary" id="update-account">Update</button></p>
+</div>      
+
+
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -17,9 +17,9 @@ stocks.forEach(function(stock) {allData.push({});});
 function submitRandomOrder(index) {
   
   // order
-  var exchangeData = allData[index];
+  var exchangeData = allData[index];  
   var ord = nocklib.generateRandomOrder(exchangeData); 
-  ord.stock = stocks[index];
+  ord.stock = stocks[index]; 
   //console.log('order', ord);
   if (ord.type == exch.BUY)
     allData[index] = exch.buy(ord.price, ord.volume, exchangeData);
@@ -30,7 +30,7 @@ function submitRandomOrder(index) {
     if (exchangeData.trades && exchangeData.trades.length > 0) {
       var trades = exchangeData.trades.map(function(trade) {
         trade.init = (ord.type == exch.BUY) ? 'b' : 's';
-        trade.stock = stocks[index];
+        trade.stock = stocks[index]; 
         return trade;
       });
       nocklib.sendTrades(exchangeData.trades);
@@ -98,9 +98,9 @@ app.get('/api/trades', function(req, res) {
 	});
 });
 db.open(function() {	
-    nocklib.createSocket(app);
+   nocklib.createSocket(app);
 	app.listen(3000); 
-  	for (var i=0; i<stocks.length; i++) { 
+    for (var i=0; i<stocks.length; i++) { 
         submitRandomOrder(i);
     }
 });
