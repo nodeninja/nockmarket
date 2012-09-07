@@ -22,20 +22,20 @@ module.exports = {
   addStock: function(uid, stock, callback) {  
       
     function doCallback() {
-        counter++;
-        if (counter == 2) {
-            callback(null, price);
-        }
-    }            
-    var counter = 0;
+          counter++;
+          if (counter == 2) {
+              callback(null, price);
+          }
+      }            
+      var counter = 0;
 
-    var price;
+      var price;
       
-    module.exports.getStockPrices([stock], function(err, retrieved) {   
+      module.exports.getStockPrices([stock], function(err, retrieved) {   
           price = retrieved[0];
           doCallback();
       });      
-      db.push('users',  new ObjectID(uid), {portfolio: stock}, doCallback);       
+      db.push('users', uid, {portfolio: stock}, doCallback);       
       
   },
 
@@ -51,7 +51,6 @@ module.exports = {
 
   createSocket: function(app) {
     io = require('socket.io').listen(app);
-    io.set('log level', 1);
     io.configure(function (){
       io.set('authorization', function (handshakeData, callback) {
         if (handshakeData.headers.cookie) {
