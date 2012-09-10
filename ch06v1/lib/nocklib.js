@@ -16,27 +16,26 @@ var  cookie = require('cookie')
 var sessionStore = new MemoryStore();
 var io;
 var online = [];
-var lastExchangeData = {};
 
 module.exports = {
 
   addStock: function(uid, stock, callback) {  
       
     function doCallback() {
-          counter++;
-          if (counter == 2) {
-              callback(null, price);
-          }
-      }            
-      var counter = 0;
+        counter++;
+        if (counter == 2) {
+            callback(null, price);
+        }
+    }            
+    var counter = 0;
 
-      var price;
+    var price;
       
-      module.exports.getStockPrices([stock], function(err, retrieved) {   
+    module.exports.getStockPrices([stock], function(err, retrieved) {   
           price = retrieved[0];
           doCallback();
       });      
-      db.push('users', uid, {portfolio: stock}, doCallback);       
+      db.push('users',  new ObjectID(uid), {portfolio: stock}, doCallback);       
       
   },
 
@@ -52,6 +51,7 @@ module.exports = {
 
   createSocket: function(app) {
     io = require('socket.io').listen(app);
+    io.set('log level', 1);
     io.configure(function (){
       io.set('authorization', function (handshakeData, callback) {
         if (handshakeData.headers.cookie) {
@@ -73,31 +73,25 @@ module.exports = {
 
       });
     io.sockets.on('connection', function (socket) {
-        
-      
       socket.on('clientchat', function (data) {
         var message = socket.handshake.session.username + ': ' + data.message + '\n';
         socket.emit('chat', { message: message});
         socket.broadcast.emit('chat', { message: message});        
       })
-    socket.on('disconnect', function (data) {
-      var username = socket.handshake.session.username;
-      var index = online.indexOf(username);
-      online.splice(index, 1);          
-      socket.broadcast.emit('disconnect', { username: username});
-    }); 
+socket.on('disconnect', function (data) {
+  var username = socket.handshake.session.username;
+  var index = online.indexOf(username);
+  online.splice(index, 1);          
+  socket.broadcast.emit('disconnect', { username: username});
+}); 
         
       socket.on('joined', function (data) {
           online.push(socket.handshake.session.username);
         var message = 'Admin: ' + socket.handshake.session.username + ' has joined\n';
         socket.emit('chat', { message: message, users: online});
-        socket.broadcast.emit('chat', { message: message, username: socket.handshake.session.username}); 
+        socket.broadcast.emit('chat', { message: message, username:     socket.handshake.session.username}); 
         
       });
-      socket.on('requestData', function (data) {
-          socket.emit('initExchangeData', {exchangeData: lastExchangeData});
-        
-      });      
       socket.on('updateAccount', function (data) {       
           module.exports.updateEmail(socket.handshake.session._id, data.email, function(err, numUpdates) {
               // Send a response back to the client here
@@ -210,14 +204,9 @@ module.exports = {
     db.findOne('users', {username: username}, callback);
   }, 
 
-  sendExchangeData: function(stock, exchangeData) {
-      lastExchangeData[stock] = exchangeData;
-      //io.sockets.emit('exchangeData', JSON.stringify(exchangeData));      
-  },
-  
   sendTrades: function(trades) {
       io.sockets.emit('trade', JSON.stringify(trades));
-  },
+  }    ,
   
   updateEmail: function(id, email, callback) {
     db.updateById('users', new ObjectID(id), {email: email}, callback);
