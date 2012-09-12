@@ -17,7 +17,7 @@ var sessionStore = new MemoryStore();
 var io;
 var online = [];
 var lastExchangeData = {};
-
+var temp = 0;
 module.exports = {
 
     addStock: function(uid, stock, callback) {
@@ -36,7 +36,7 @@ module.exports = {
             price = retrieved[0];
             doCallback();
         });
-        db.push('users', uid, {portfolio: stock}, doCallback);
+        db.push('users', new ObjectID(uid), {portfolio: stock}, doCallback);
 
     },
 
@@ -130,7 +130,7 @@ module.exports = {
         var order = {};
         if (Math.random() > 0.5)
             order.type = exchange.BUY
-        else
+        else    
             order.type = exchange.SELL
 
         var buyExists = exchangeData.buys
@@ -211,9 +211,30 @@ module.exports = {
     },
 
     sendExchangeData: function(stock, exchangeData) {
-        var lastSent = module.exports.transformExchangeData(lastExchangeData[stock]);
-        var current = module.exports.transformExchangeData(exchangeData);
-        //console.log(lastExchangeData[stock]);
+        temp++;
+        var lastSent = transformStockData(stock, lastExchangeData[stock]);
+        var current = transformStockData(stock, exchangeData);
+        
+        var deltas = {};
+        if (current.tp != lastSent.tp)
+            deltas.tp = current.tp
+        if (current.tv != lastSent.tv)
+            deltas.tv = current.tv            
+        for (var i=1; i<= 5; i++) {
+            if (current['b' + i + 'p'] != lastSent['b' + i + 'p'])
+                deltas['b' + i + 'p'] = current['b' + i + 'p'];
+            if (current['b' + i + 'v'] != lastSent['b' + i + 'v'])
+                deltas['b' + i + 'v'] = current['b' + i + 'v'];
+            if (current['a' + i + 'p'] != lastSent['a' + i + 'p'])
+                deltas['a' + i + 'p'] = current['a' + i + 'p'];
+            if (current['a' + i + 'v'] != lastSent['a' + i + 'v'])
+                deltas['a' + i + 'v'] = current['a' + i + 'v'];                
+        }
+        
+        if (1000 == temp) {
+           // console.log(stock, lastSent, current, deltas);
+           // process.exit(1);
+        }
         lastExchangeData[stock] = exchangeData;
         io.sockets.emit('exchangeData', current);
     },
@@ -221,14 +242,13 @@ module.exports = {
     sendTrades: function(trades) {
         io.sockets.emit('trade', JSON.stringify(trades));
     },
-
     
     transformExchangeData: function(data) {
         var transformed = [];
         for (var stock in data) {
             var existingData = data[stock];
-var newData = transformStockData(stock, existingData);
-transformed.push(newData); 
+            var newData = transformStockData(stock, existingData);
+            transformed.push(newData); 
         }
         return transformed;
     },
@@ -248,13 +268,13 @@ function encryptPassword(plainText) {
 function transformStockData(stock, existingData) {
             var newData = {};
             newData.st = stock;
-            if (existingData.trades) {
+            if (existingData && existingData.trades) {
                 newData.tp = existingData.trades[0].price;
                 newData.tv = existingData.trades[0].volume;
             }
             var buyPrices = {};
             var askPrices = {};
-            if (existingData.buys) {
+            if (existingData && existingData.buys) {
                 buyPrices = Object.keys(existingData.buys.volumes);
                 for (var i=buyPrices.length - 5; i<buyPrices.length; i++) {
                     var index = buyPrices.length - i;
@@ -262,7 +282,7 @@ function transformStockData(stock, existingData) {
                     newData['b' + index + 'v'] = existingData.buys.volumes[buyPrices[i]];
                 }
             }
-            if (existingData.sells)   {
+            if (existingData && existingData.sells)   {
                 askPrices = Object.keys(existingData.sells.volumes);
                 for (var i=0; i<5; i++) {
                     var index = i + 1;

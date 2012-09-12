@@ -1,11 +1,16 @@
 $(document).ready(function() {
 
+    var ids = {};
     $.get('/templates/trade-table.ejs', function(storedTemplate) {
         
         var loaded = true;
         socket.emit('requestData', {});
     
-        var StockModel = Backbone.Model.extend({
+        var StockModel = Backbone.Model.extend({            
+            updatePrices: function(deltas) {
+                console.log('ub', deltas);
+                this.set({deltas: deltas});
+            }              
         });
     
         var StockCollection = Backbone.Collection.extend({
@@ -29,12 +34,32 @@ $(document).ready(function() {
         var StockRowView = Backbone.View.extend({
     
             tagName: 'tr',
+            
+            initialize: function() {
+                _.bindAll(this, 'setPrices');
+                this.model.bind('change', this.setPrices);
+            },            
     
             render: function() {
                 var template = _.template(storedTemplate);      
                 var htmlString = template(this.model.toJSON());
                 $(this.el).html(htmlString);
                 return this;
+            },
+
+            setPrices: function(deltas) {
+                console.log('sp', deltas.attributes);
+                var prices = deltas.attributes;
+                for (var attr in prices) {
+                    var value = prices[attr];
+                    if (value > 0) {
+                        //console.log('#' + prices.st + attr, value);
+                        $('#' + prices.st + attr).html(value);
+                    }
+                    else {
+                       // console.log(value);
+                    }
+                }
             }
     
         });
@@ -42,16 +67,19 @@ $(document).ready(function() {
         socket.on('initExchangeData', function (data) {
             window.stockCollection = new StockCollection();
             for (var stock in data.exchangeData) {
-                data.exchangeData[stock].stock = stock;
                 var stockModel = new StockModel(data.exchangeData[stock]);
+                ids[stock] = stockModel.id;
+                stockModel.set({id: data.exchangeData[stock].st});
                 window.stockCollection.push(stockModel);
             }
             loaded = true;
             new StockView();
         });
-        socket.on('exchangeData', function (data) {
+        socket.on('exchangeData', function (deltas) {
             if (loaded) {
-                console.log(data);
+                var model = window.stockCollection.get(deltas.st);
+                model.updatePrices(deltas);
+               // console.log(deltas.st, model);
             }
             
         });

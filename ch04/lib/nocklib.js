@@ -28,7 +28,7 @@ module.exports = {
           price = retrieved[0];
           doCallback();
       });      
-      db.push('users', uid, {portfolio: stock}, doCallback);       
+      db.push('users', new ObjectID(uid), {portfolio: stock}, doCallback);       
       
   },
 
