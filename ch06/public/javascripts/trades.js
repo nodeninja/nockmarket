@@ -8,7 +8,6 @@ $(document).ready(function() {
     
         var StockModel = Backbone.Model.extend({            
             updatePrices: function(deltas) {
-                console.log('ub', deltas);
                 this.set({deltas: deltas});
             }              
         });
@@ -47,17 +46,12 @@ $(document).ready(function() {
                 return this;
             },
 
-            setPrices: function(deltas) {
-                console.log('sp', deltas.attributes);
-                var prices = deltas.attributes;
+            setPrices: function() {
+                var prices = this.model.toJSON().deltas;
                 for (var attr in prices) {
                     var value = prices[attr];
-                    if (value > 0) {
-                        //console.log('#' + prices.st + attr, value);
-                        $('#' + prices.st + attr).html(value);
-                    }
-                    else {
-                       // console.log(value);
+                    if (value > 0) {                        
+                        $('#' + prices.st + attr).html(pad(value));
                     }
                 }
             }
@@ -79,7 +73,6 @@ $(document).ready(function() {
             if (loaded) {
                 var model = window.stockCollection.get(deltas.st);
                 model.updatePrices(deltas);
-               // console.log(deltas.st, model);
             }
             
         });
@@ -88,3 +81,12 @@ $(document).ready(function() {
 
 });
 
+function pad(number) {
+    var length = 5;
+    var str = '' + number;
+    while (str.length < length) {
+        str = str + '&nbsp;';
+    }
+   
+    return str;    
+}
