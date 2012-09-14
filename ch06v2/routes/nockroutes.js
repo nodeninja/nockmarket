@@ -31,7 +31,17 @@ module.exports = {
             if (user && user.portfolio)
                 portfolio = user.portfolio;
             nocklib.getStockPrices(portfolio, function(err, prices) {
+              if (req.xhr) {
+                var data = [];
+                  for (var i=0; i < portfolio.length; i++) {
+                    data.push({stock: portfolio[i], price: prices[i]});
+                  }
+                res.json(data);  
+              } 
+              else {
                 res.render('portfolio', {portfolio: portfolio, prices: prices, email: user.email});
+              }
+
             });
              
         });

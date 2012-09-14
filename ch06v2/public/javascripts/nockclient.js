@@ -5,7 +5,7 @@ $(document).ready(function() {
             , url: '/api/user/' + $('.uname').val()
         }).done(function(found) {
             if (found == '1') {
-                $('#imagePlaceHolder').html('<img src="http://nodeninja.github.com/book/chapter02/cross.png">');
+                $('#imagePlaceHolder').html('<img src="http://nodeninja.github.com/book/chapter02/cross.png"> Username already taken');
                 $('.create-button').addClass('disabled').attr('disabled', true);
             }
             else {

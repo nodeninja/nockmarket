@@ -6,12 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
     <link href="http://nodeninja.github.com/book/chapter02/docs.css" rel="stylesheet">
+    <link href="/stylesheets/nockmarket.css" rel="stylesheet">
     <script src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js"></script>
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/jquery.js"></script>
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-button.js"></script>
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-modal.js"></script>
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-transition.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
+    <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+    <script src="http://backbonejs.org/backbone-min.js"></script>
+    <script src="http://github.com/janl/mustache.js/raw/master/mustache.js"></script> 
     <script type="text/javascript" src="/javascripts/portfolio.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/javascripts/chat.js"></script>
@@ -37,7 +41,12 @@
                         <div class="well form-search">
                             <input id="stock" type="text" class="input-medium search-query" name="stock">
                             <button id="add-stock" class="btn">Add Stock</button>
+    <hr />
+    <input id="filter" type="text" class="input-medium search-query" name="filter">
+    <button class="add-filter btn">Filter</button>
+
                         </div>
+
                         <table class="table table-striped table-bordered table-condensed">
                             <thead>
                             <tr>
@@ -46,10 +55,6 @@
                             </tr>
                             </thead>
                             <tbody class="stock-list">
-<% for (var i=0; i<portfolio.length; i++) { %>
-<tr><td><%=portfolio[i]%></td>
-<td><%=prices[i]%></td></tr>
-<% } %>
 
                             </tbody>
                         </table>
@@ -59,22 +64,23 @@
     <thead>
         <tr>
             <th>Stock</th>
-            <th>B5</th>
-            <th>B4</th>
-            <th>B3</th>
-            <th>B2</th>
-            <th>B1</th>
+            <th>BID5</th>
+            <th>BID4</th>
+            <th>BID3</th>
+            <th>BID2</th>
+            <th>BID1</th>
             <th>Trade</th>
-            <th>A1</th>
-            <th>A2</th>
-            <th>A3</th>
-            <th>A4</th>
-            <th>A5</th>
+            <th>ASK1</th>
+            <th>ASK2</th>
+            <th>ASK3</th>
+            <th>ASK4</th>
+            <th>ASK5</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="stock-data">
     </tbody>
 </table>
+
                     </div>
 <div class="tab-pane" id="tab3">
 <p><textarea class="input-xlarge span8" id="textarea" rows="20"></textarea></p>
