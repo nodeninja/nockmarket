@@ -5,7 +5,7 @@ var Db = require('mongodb').Db
 var envHost = process.env['MONGO_NODE_DRIVER_HOST']
 	, envPort = process.env['MONGO_NODE_DRIVER_PORT'] 
 	, host = envHost != null ? envHost: 'localhost'
-	, port = envPort != null ? envPort : Connection.DEFAULT_PORT;
+	, port = envPort != null ? parseInt(envPort, 10) : Connection.DEFAULT_PORT;
 
 var db = new Db('nockmarket'
           , new Server(host, port, {})
@@ -35,7 +35,24 @@ module.exports = {
     },    
     
     open: function(callback) {
-      db.open(callback);
+        db.open(function(err, data) {
+            if (process.env.MONGO_NODE_DRIVER_USER) {
+                data.authenticate(process.env.MONGO_NODE_DRIVER_USER
+                , process.env.MONGO_NODE_DRIVER_PASS, function(err2, authData) {
+                    if(authData){
+                        callback();
+                    }
+                    else{
+                        console.log(err2);
+                        return;
+                    }
+                });
+            }
+            else {
+                callback();
+            }
+        });
+
     },
     
    push: function(name, id, updateQuery, callback) {

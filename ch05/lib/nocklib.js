@@ -1,13 +1,13 @@
 'use strict';
 
-var  cookie = require('cookie')
-  , crypto = require('crypto')
+var cookie = require('cookie')
+    , crypto = require('crypto')
   , db = require('./db')
   , exchange = require('./exchange')
-  , express = require('express')  
+    , express = require('express')  
   , http = require('http')  
+    , MemoryStore = express.session.MemoryStore  
   , ObjectID = require('mongodb').ObjectID  
-  , MemoryStore = express.session.MemoryStore  
   , priceFloor = 35
   , priceRange = 10
   , volFloor = 80
@@ -35,7 +35,7 @@ module.exports = {
           price = retrieved[0];
           doCallback();
       });      
-      db.push('users', uid, {portfolio: stock}, doCallback);       
+      db.push('users', new ObjectID(uid), {portfolio: stock}, doCallback);       
       
   },
 
@@ -48,7 +48,7 @@ module.exports = {
             callback(err, null);
       }); 
   }, 
-
+    
   createSocket: function(app) {
     io = require('socket.io').listen(app);
     io.configure(function (){
@@ -71,8 +71,8 @@ module.exports = {
         }
 
       });
-    io.sockets.on('connection', function (socket) {
-      socket.on('clientchat', function (data) {
+          io.sockets.on('connection', function (socket) {
+                    socket.on('clientchat', function (data) {
         var message = socket.handshake.session.username + ': ' + data.message + '\n';
         socket.emit('chat', { message: message});
         socket.broadcast.emit('chat', { message: message});        
@@ -83,28 +83,30 @@ socket.on('disconnect', function (data) {
   online.splice(index, 1);          
   socket.broadcast.emit('disconnect', { username: username});
 }); 
-        
+
       socket.on('joined', function (data) {
           online.push(socket.handshake.session.username);
         var message = 'Admin: ' + socket.handshake.session.username + ' has joined\n';
         socket.emit('chat', { message: message, users: online});
-        socket.broadcast.emit('chat', { message: message, username:     socket.handshake.session.username}); 
+        socket.broadcast.emit('chat', { message: message, username:     socket.handshake.session.username});
         
       });
-      socket.on('updateAccount', function (data) {       
+      
+            socket.on('updateAccount', function (data) {       
           module.exports.updateEmail(socket.handshake.session._id, data.email, function(err, numUpdates) {
               // Send a response back to the client here
               socket.emit('updateSuccess', {}); 
             });
       });
-      
+
+
     });
-      
-    });   
+
+    }); 
+    
   },
 
-    
-  createUser: function(username, email, password, callback) {
+createUser: function(username, email, password, callback) {
       
     var user = {username: username
                 , email: email
@@ -205,9 +207,10 @@ socket.on('disconnect', function (data) {
 
   sendTrades: function(trades) {
       io.sockets.emit('trade', JSON.stringify(trades));
-  }    ,
-  
+  }   ,
+
   updateEmail: function(id, email, callback) {
+      console.log(1234, email);
     db.updateById('users', new ObjectID(id), {email: email}, callback);
   }
 

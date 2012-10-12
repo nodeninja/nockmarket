@@ -41,10 +41,10 @@ module.exports = {
    push: function(name, id, updateQuery, callback) {
         db.collection(name).update({_id: id}, {$push: updateQuery}, {safe:true}, callback);      
     },    
-
+    
     updateById: function(name, id, updateQuery, callback) {
         db.collection(name).update({_id: id}, {$set: updateQuery}, {safe:true}, callback);        
     } 
 
-    
+
 }

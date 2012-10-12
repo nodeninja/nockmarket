@@ -6,13 +6,14 @@ var db = require('./lib/db')
   , express = require('express')
   , nocklib = require('./lib/nocklib')
   , nockroutes = require('./routes/nockroutes.js')  
+  , stocks = ['NOCK1'] 
   , timeFloor = 500
-  , timeRange = 1000
-  , _ = require('underscore');
+  , timeRange = 1000;
 
-var stocks = ['NOCK1', 'NOCK2', 'NOCK3', 'NOCK4', 'NOCK5'];
+var stocks   = ['NOCK1', 'NOCK2', 'NOCK3', 'NOCK4', 'NOCK5'];
 var allData = [];
 stocks.forEach(function(stock) {allData.push({});});
+
 
 function submitRandomOrder(index) {
   
@@ -22,18 +23,18 @@ function submitRandomOrder(index) {
   ord.stock = stocks[index]; 
   //console.log('order', ord);
   if (ord.type == exch.BUY)
-    allData[index] = exch.buy(ord.price, ord.volume, exchangeData);
+    allData[index]  = exch.buy(ord.price, ord.volume, exchangeData);
   else  
-    allData[index] = exch.sell(ord.price, ord.volume, exchangeData);  
-
+    allData[index]  = exch.sell(ord.price, ord.volume, exchangeData);  
+      
   db.insertOne('transactions', ord, function(err, order) {
-    if (exchangeData.trades && exchangeData.trades.length > 0) {
+    if (exchangeData.trades  && exchangeData.trades.length > 0) {
+      nocklib.sendTrades(exchangeData.trades);
       var trades = exchangeData.trades.map(function(trade) {
         trade.init = (ord.type == exch.BUY) ? 'b' : 's';
         trade.stock = stocks[index]; 
         return trade;
       });
-      nocklib.sendTrades(exchangeData.trades);
       db.insert('transactions', trades, function(err, trades) {
         pauseThenTrade();
       });
@@ -45,7 +46,7 @@ function submitRandomOrder(index) {
     
   function pauseThenTrade() { 
     var pause = Math.floor(Math.random() * timeRange) + timeFloor;
-    setTimeout(submitRandomOrder.bind(this, index), pause);
+      setTimeout(submitRandomOrder.bind(this, index), pause); 
     //console.log(exch.getDisplay(exchangeData));      
   }
 
@@ -97,12 +98,14 @@ app.get('/api/trades', function(req, res) {
 		res.json(json);
 	});
 });
-db.open(function() {	
-   nocklib.createSocket(app);
+db.open(function() {
+    nocklib.createSocket(app);
 	app.listen(3000); 
     for (var i=0; i<stocks.length; i++) { 
         submitRandomOrder(i);
-    }
+    } 
+    
+  //	submitRandomOrder();  
 });
 
 	

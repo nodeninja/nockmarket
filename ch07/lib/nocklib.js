@@ -53,6 +53,9 @@ module.exports = {
   createSocket: function(app) {
     io = require('socket.io').listen(app);
     io.configure(function (){
+      io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10);     
+    
       io.set('authorization', function (handshakeData, callback) {
         if (handshakeData.headers.cookie) {
             handshakeData.cookie = cookie.parse(decodeURIComponent(handshakeData.headers.cookie));

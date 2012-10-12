@@ -12,11 +12,13 @@
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-modal.js"></script>
     <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-transition.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
-    <script type="text/javascript" src="/javascripts/portfolio.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/javascripts/chat.js"></script>
-<script src="/javascripts/trades.js"></script>
-<script src="/javascripts/account.js"></script>
+    <script type="text/javascript" src="/js/portfolio.js"></script>
+    <script src="/socket.io/socket.io.js">
+</script>
+    <script src="/js/chat.js"></script>
+    <script src="/js/trades.js"></script>
+<script src="/js/account.js"></script>
+
 </head>
 <body>
 <div class="container">
@@ -30,7 +32,7 @@
                     <li class="active"><a href="#tab1" data-toggle="tab">Portfolio</a></li>
                     <li><a href="#tab2" data-toggle="tab">Nockmarket</a></li>
 <li><a href="#tab3" data-toggle="tab" id="chat-tab">Chat</a></li>
-<li><a href="#tab4" data-toggle="tab">My Account</a></li>
+<li><a href="#tab4" data-toggle="tab">My Account</a></li>  
                 </ul>
                 <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
                     <div class="tab-pane active" id="tab1">
@@ -55,39 +57,19 @@
                         </table>
                     </div>
                     <div class="tab-pane" id="tab2">
-<table class="table table-bordered table-condensed">
-    <thead>
-        <tr>
-            <th>Stock</th>
-            <th>B5</th>
-            <th>B4</th>
-            <th>B3</th>
-            <th>B2</th>
-            <th>B1</th>
-            <th>Trade</th>
-            <th>A1</th>
-            <th>A2</th>
-            <th>A3</th>
-            <th>A4</th>
-            <th>A5</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+                        <p>Howdy, I'm in Section 2.</p>
                     </div>
 <div class="tab-pane" id="tab3">
-<p><textarea class="input-xlarge span8" id="textarea" rows="20"></textarea></p>
-<p><input type="text" class="input-xlarge span8" id="input01" placeholder="Enter your message"></p>
-<p><button type="submit" class="btn btn-primary" id="send-chat">Send</button></p>
-<p><span class="label label-inverse" id="online">Online:</span><div id="users"></div></p>
+<p> <button class="btn btn-info btn-large btn-primary" type="button" id="join-chat">Join Chat</button></p>        
+<p><textarea class="input-xlarge span8 chat-widget" id="textarea" rows="20"></textarea></p>
+<p><input type="text" class="input-xlarge span8 chat-widget" id="input01" placeholder="Enter your message"></p>
+<p><button type="submit" class="btn btn-primary chat-widget" id="send-chat">Send</button></p>
+<p><span class="label label-inverse chat-widget" id="online">Online:</span><div id="users"></div></p>
 </div>
 <div class="tab-pane" id="tab4">
-<p><input type="text" class="input-xlarge span8" id="email" value="<%=email%>"></p>
+<p><input type="text" class="input-xlarge span8" id="email" value="<%=email%>"</p>
 <p><button type="submit" class="btn btn-primary" id="update-account">Update</button></p>
 </div>      
-
-
 
                 </div>
             </div>
