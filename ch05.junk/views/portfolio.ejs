@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Nockmarket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="http://nodeninja.github.com/book/chapter02/docs.css" rel="stylesheet">
+    <script src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/jquery.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-button.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-modal.js"></script>
+    <script type="text/javascript" src="http://nodeninja.github.com/book/chapter02/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
+    <script type="text/javascript" src="/javascripts/portfolio.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/chat.js"></script>
+<script src="/javascripts/trades.js"></script>
+<script src="/javascripts/account.js"></script>
+</head>
+<body>
+<div id="chatModal" class="modal hide fade smallModal">
+    <div class="modal-header"><a data-dismiss="modal" class="close"></a>
+        <h3>Join chat?</h3></div>
+    <div class="modal-body">
+        <fieldset>
+            Do you wish to join the Nockmarket chat room?
+        </fieldset>
+
+    </div>
+    <div class="modal-footer"><a href="#" data-dismiss="modal" class="btn">No</a>
+        <button  class="btn btn-primary" type="submit">Yes
+        </button>
+<a href="#tab3" data-dismiss="modal" id="show-chat">My Account</a>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="offset2 span8">
+            <h3>Welcome to the Nockmarket</h3>
+            <p>Here you can manage your portfolio and view live prices.</p>
+
+            <div class="tabbable" style="margin-bottom: 18px;">
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active"><a href="#tab1" data-toggle="tab">Portfolio</a></li>
+                    <li><a href="#tab2" data-toggle="tab">Nockmarket</a></li>
+<li><a data-toggle="modal" href="#tab3" id="chat-tab">Chat</a></li>
+<li><a href="#tab4" data-toggle="tab">My Account</a></li>
+                </ul>
+                <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
+                    <div class="tab-pane active" id="tab1">
+                        <div class="well form-search">
+                            <input id="stock" type="text" class="input-medium search-query" name="stock">
+                            <button id="add-stock" class="btn">Add Stock</button>
+                        </div>
+                        <table class="table table-striped table-bordered table-condensed">
+                            <thead>
+                            <tr>
+                                <th>Stock Code</th>
+                                <th>Last Price</th>
+                            </tr>
+                            </thead>
+                            <tbody class="stock-list">
+<% for (var i=0; i<portfolio.length; i++) { %>
+<tr><td><%=portfolio[i]%></td>
+<td><%=prices[i]%></td></tr>
+<% } %>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="tab2">
+<table class="table table-bordered table-condensed">
+    <thead>
+        <tr>
+            <th>Stock</th>
+            <th>B5</th>
+            <th>B4</th>
+            <th>B3</th>
+            <th>B2</th>
+            <th>B1</th>
+            <th>Trade</th>
+            <th>A1</th>
+            <th>A2</th>
+            <th>A3</th>
+            <th>A4</th>
+            <th>A5</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+                    </div>
+<div class="tab-pane" id="tab3">
+<p><textarea class="input-xlarge span8" id="textarea" rows="20"></textarea></p>
+<p><input type="text" class="input-xlarge span8" id="input01" placeholder="Enter your message"></p>
+<p><button type="submit" class="btn btn-primary" id="send-chat">Send</button></p>
+<p><span class="label label-inverse" id="online">Online:</span><div id="users"></div></p>
+</div>
+<div class="tab-pane" id="tab4">
+<p><input type="text" class="input-xlarge span8" id="email" value="<%=email%>"></p>
+<p><button type="submit" class="btn btn-primary" id="update-account">Update</button></p>
+</div>      
+
+
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+</body>
+</html>
